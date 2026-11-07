@@ -1,0 +1,50 @@
+{
+	"geode": "5.11.2",
+	"gd": "2.2081",
+	"id": "yourname.input-buffer",
+	"name": "Predictive Input Buffer",
+	"version": "v1.0.0",
+	"developer": "YourName",
+	"description": "Practice and accessibility assist: holds a jump press for a few physics ticks and fires it on the first tick you can act. Turn it off (mode 1) for any run you plan to submit for verification.",
+	"repository": "https://github.com/yourname/input-buffer",
+	"tags": ["gameplay", "utility"],
+	"settings": {
+		"buffer-mode": {
+			"type": "string",
+			"name": "Buffer Mode",
+			"description": "How long a press that arrives while you cannot act is held and then fired on the first tick you can.\n<cy>1 - Off</c>: vanilla input.\n<cy>2 - Low</c>: up to 4 ticks.\n<cy>3 - Medium</c>: up to 6 ticks.\n<cy>4 - High</c>: up to 10 ticks.\nA tick is one physics step of the game. At the usual 240 ticks per second, 4 / 6 / 10 ticks is about 17 / 25 / 42 ms. <cr>Recommended OFF for runs submitted for verification.</c>",
+			"default": "1 - Off",
+			"one-of": [
+				"1 - Off",
+				"2 - Low (4 ticks)",
+				"3 - Medium (6 ticks)",
+				"4 - High (10 ticks)"
+			]
+		},
+		"cycle-key": {
+			"type": "keybind",
+			"name": "Cycle Mode Hotkey",
+			"description": "Cycles Off > Low > Medium > High while a level is open. Can be rebound to a keyboard key, mouse button or controller button.",
+			"default": "Shift+B",
+			"category": "gameplay"
+		},
+		"show-confirmation": {
+			"type": "bool",
+			"name": "Show Confirmation Toast",
+			"description": "Briefly shows the new mode and its buffer size when you change it with the hotkey or the pause-menu button.",
+			"default": true
+		},
+		"show-hud-indicator": {
+			"type": "bool",
+			"name": "Show HUD Indicator",
+			"description": "Shows a small BUFFERED label at the top of the screen while a press is waiting to fire.",
+			"default": false
+		},
+		"debug-log": {
+			"type": "bool",
+			"name": "Debug Logging",
+			"description": "Logs every buffered press, fire and a ticks-per-second measurement to the Geode log. Use it to verify the window sizes on your setup.",
+			"default": false
+		}
+	}
+}
