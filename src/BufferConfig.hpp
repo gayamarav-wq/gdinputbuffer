@@ -20,8 +20,10 @@ namespace ibuf {
 inline constexpr int kLowTicks    = 4;   // Mode 2
 inline constexpr int kMediumTicks = 6;   // Mode 3
 inline constexpr int kHighTicks   = 10;  // Mode 4
+inline constexpr int kExtremeTicks  = 20;  // Mode 5
+inline constexpr int kUltimateTicks = 45;  // Mode 6
 
-enum class Mode : int { Off = 1, Low = 2, Medium = 3, High = 4 };
+enum class Mode : int { Off = 1, Low = 2, Medium = 3, High = 4, Extreme = 5, Ultimate = 6 };
 
 // Safe default: opt-in. Change it here AND in mod.json ("default") if you want
 // the mod to start enabled.
@@ -32,6 +34,8 @@ constexpr int windowTicks(Mode m) noexcept {
         case Mode::Low:    return kLowTicks;
         case Mode::Medium: return kMediumTicks;
         case Mode::High:   return kHighTicks;
+        case Mode::Extreme:  return kExtremeTicks;
+        case Mode::Ultimate: return kUltimateTicks;
         default:           return 0;  // Off
     }
 }
@@ -41,19 +45,21 @@ constexpr const char* modeName(Mode m) noexcept {
         case Mode::Low:    return "Low";
         case Mode::Medium: return "Medium";
         case Mode::High:   return "High";
+        case Mode::Extreme:  return "Extreme";
+        case Mode::Ultimate: return "Ultimate";
         default:           return "Off";
     }
 }
 
-// 1 -> 2 -> 3 -> 4 -> 1 ...
+// 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 1 ...
 constexpr Mode nextMode(Mode m) noexcept {
-    return m == Mode::High ? Mode::Off : static_cast<Mode>(static_cast<int>(m) + 1);
+    return m == Mode::Ultimate ? Mode::Off : static_cast<Mode>(static_cast<int>(m) + 1);
 }
 
 // The setting is stored as its display label ("3 - Medium (6 ticks)"); the
 // leading digit is the mode number, so labels can be reworded freely.
 inline Mode parseMode(std::string_view label) noexcept {
-    if (!label.empty() && label[0] >= '1' && label[0] <= '4') {
+    if (!label.empty() && label[0] >= '1' && label[0] <= '6') {
         return static_cast<Mode>(label[0] - '0');
     }
     return kDefaultMode;

@@ -22,7 +22,9 @@ def const(name):
     return int(m.group(1))
 
 low, med, high = const("kLowTicks"), const("kMediumTicks"), const("kHighTicks")
-expected = ["1 - Off", f"2 - Low ({low} ticks)", f"3 - Medium ({med} ticks)", f"4 - High ({high} ticks)"]
+ext, ult = const("kExtremeTicks"), const("kUltimateTicks")
+expected = ["1 - Off", f"2 - Low ({low} ticks)", f"3 - Medium ({med} ticks)", f"4 - High ({high} ticks)",
+            f"5 - Extreme ({ext} ticks)", f"6 - Ultimate ({ult} ticks)"]
 
 setting = mod["settings"]["buffer-mode"]
 if setting.get("one-of") != expected:
@@ -30,7 +32,7 @@ if setting.get("one-of") != expected:
 if setting.get("default") not in expected:
     errors.append("buffer-mode default is not one of the labels")
 desc = setting.get("description", "")
-for word, n in (("Low", low), ("Medium", med), ("High", high)):
+for word, n in (("Low", low), ("Medium", med), ("High", high), ("Extreme", ext), ("Ultimate", ult)):
     if f"{word}</c>: up to {n} ticks" not in desc:
         errors.append(f"buffer-mode description does not mention '{word}: up to {n} ticks'")
 
@@ -55,4 +57,4 @@ if errors:
     print("mod.json / BufferConfig check FAILED:")
     for e in errors: print("  -", e)
     sys.exit(1)
-print(f"mod.json check OK  (windows: low={low}, medium={med}, high={high} ticks; settings used: {sorted(used)})")
+print(f"mod.json check OK  (windows: low={low}, medium={med}, high={high}, extreme={ext}, ultimate={ult} ticks; settings used: {sorted(used)})")

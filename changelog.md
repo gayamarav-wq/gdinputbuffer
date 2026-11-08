@@ -1,3 +1,11 @@
+# v1.1.0
+
+* New modes: **5 - Extreme** (20 ticks) and **6 - Ultimate** (45 ticks). The hotkey and pause button now cycle through all six modes.
+* New constants `kExtremeTicks` / `kUltimateTicks` in `src/BufferConfig.hpp`; `mod.json` labels and tests updated.
+* Extreme and Ultimate are very forgiving (about 83 ms and 188 ms at 240 ticks/s) and can fire a jump you no longer meant. Not recommended for verified runs.
+* Settings saved under v1.0.0 keep working (labels for modes 1-4 are unchanged).
+* Fixes from the first CI builds: per-platform `gd` object in `mod.json`, 3-argument `processCommands` (half ticks are not counted), typed `listenForSettingChanges`.
+
 # v1.0.0
 
 * Initial release.

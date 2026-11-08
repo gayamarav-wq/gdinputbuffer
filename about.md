@@ -9,6 +9,8 @@
 2. **Low** - up to 4 ticks
 3. **Medium** - up to 6 ticks
 4. **High** - up to 10 ticks
+5. **Extreme** - up to 20 ticks (very forgiving)
+6. **Ultimate** - up to 45 ticks (very forgiving)
 
 A tick is one physics step. One press fires at most once, and an expired press is never fired.
 

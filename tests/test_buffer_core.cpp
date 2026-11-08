@@ -28,11 +28,15 @@ static void test_config() {
     CHECK(windowTicks(Mode::Low) == 4);
     CHECK(windowTicks(Mode::Medium) == 6);
     CHECK(windowTicks(Mode::High) == 10);
+    CHECK(windowTicks(Mode::Extreme) == 20);
+    CHECK(windowTicks(Mode::Ultimate) == 45);
     CHECK(nextMode(Mode::Off) == Mode::Low);
     CHECK(nextMode(Mode::Low) == Mode::Medium);
     CHECK(nextMode(Mode::Medium) == Mode::High);
-    CHECK(nextMode(Mode::High) == Mode::Off);
-    for (int i = 1; i <= 4; ++i) {
+    CHECK(nextMode(Mode::High) == Mode::Extreme);
+    CHECK(nextMode(Mode::Extreme) == Mode::Ultimate);
+    CHECK(nextMode(Mode::Ultimate) == Mode::Off);
+    for (int i = 1; i <= 6; ++i) {
         Mode m = static_cast<Mode>(i);
         CHECK(parseMode(modeLabel(m)) == m);           // label round-trips
     }
@@ -40,6 +44,10 @@ static void test_config() {
     CHECK(modeLabel(Mode::Low) == "2 - Low (4 ticks)");
     CHECK(modeLabel(Mode::Medium) == "3 - Medium (6 ticks)");
     CHECK(modeLabel(Mode::High) == "4 - High (10 ticks)");
+    CHECK(modeLabel(Mode::Extreme) == "5 - Extreme (20 ticks)");
+    CHECK(modeLabel(Mode::Ultimate) == "6 - Ultimate (45 ticks)");
+    CHECK(parseMode("7 - nope") == kDefaultMode);
+    CHECK(parseMode("0") == kDefaultMode);
     CHECK(parseMode("") == kDefaultMode);
     CHECK(parseMode("garbage") == kDefaultMode);
 }
@@ -47,7 +55,7 @@ static void test_config() {
 // ---- helpers ----------------------------------------------------------------
 // Press at tick T (cannot act). Player becomes able to act at tick `ableAt`
 // and stays able. Returns the tick at which Out::Press fired, or 0 if never.
-static Tick run_until_fire(int window, Tick T, Tick ableAt, Tick horizon = 40) {
+static Tick run_until_fire(int window, Tick T, Tick ableAt, Tick horizon = 100) {
     Slot s;
     s.onPress(T, /*couldAct=*/false, window);
     for (Tick t = T + 1; t <= T + horizon; ++t) {
@@ -59,7 +67,7 @@ static Tick run_until_fire(int window, Tick T, Tick ableAt, Tick horizon = 40) {
 
 // ---- window boundaries ------------------------------------------------------
 static void test_windows() {
-    for (int W : {kLowTicks, kMediumTicks, kHighTicks}) {
+    for (int W : {kLowTicks, kMediumTicks, kHighTicks, kExtremeTicks, kUltimateTicks}) {
         const Tick T = 100;
         for (Tick d = 1; d <= static_cast<Tick>(W); ++d)            // inside window -> fires, first able tick
             CHECK(run_until_fire(W, T, T + d) == T + d);
@@ -220,10 +228,10 @@ static void test_two_players_independent() {
 // Also checks the replayed-hold bookkeeping (no phantom held button).
 static void test_fuzz() {
     std::mt19937 rng(12345);
-    const std::array<int, 4> windows{0, kLowTicks, kMediumTicks, kHighTicks};
+    const std::array<int, 6> windows{0, kLowTicks, kMediumTicks, kHighTicks, kExtremeTicks, kUltimateTicks};
     long fires = 0, expiries = 0;
     for (int round = 0; round < 4000; ++round) {
-        const int W = windows[rng() % 4];
+        const int W = windows[rng() % 6];
         Slot s;
         bool avail = false;           // model: live armed press
         Tick armTick = 0;
@@ -233,7 +241,7 @@ static void test_fuzz() {
         Tick heldSince = 0;
         int heldTicks = 0;
         int firesForThisPress = 0;
-        for (Tick t = 1; t <= 150; ++t) {
+        for (Tick t = 1; t <= 300; ++t) {
             const bool able = (rng() % 6) == 0;
 
             // --- model expectation for this tick

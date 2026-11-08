@@ -45,7 +45,7 @@ Before publishing, change `id`, `developer` and `repository` in `mod.json` from 
 Copy the `.geode` file into `<Geometry Dash folder>/geode/mods/` and restart the game. Requires Geode v5 and GD 2.2081.
 Geode's mod list should show **Predictive Input Buffer** with no missing dependencies; the mod has none.
 
-## The four modes
+## The six modes
 
 | # | Mode | Window | At 240 ticks/s |
 |---|---|---|---|
@@ -53,11 +53,17 @@ Geode's mod list should show **Predictive Input Buffer** with no missing depende
 | 2 | Low | up to **4** ticks | ~17 ms |
 | 3 | Medium | up to **6** ticks | ~25 ms |
 | 4 | High | up to **10** ticks | ~42 ms |
+| 5 | Extreme | up to **20** ticks | ~83 ms |
+| 6 | Ultimate | up to **45** ticks | ~188 ms |
 
 A **tick** is one physics step of the game (one non-half-tick call of `GJBaseGameLayer::processCommands`).
 The window is counted in ticks, never in wall-clock time or rendered frames, so it is the same at any FPS.
 The tick rate is **not hardcoded**: the mod counts the ticks the game actually runs and uses the game's own step delta only
 to print the millisecond estimates. *If you meant 4/6/10 frames at 60 FPS rather than ticks, multiply the constants by 4 (see tuning).*
+
+**Extreme and Ultimate are very forgiving.** At 83 ms and 188 ms a buffered press can fire a jump you no longer meant
+(for example, a tap you made early and then decided against, while the player lands later), and they make the assist far more noticeable.
+They are meant for practice and accessibility use; keep them off for runs you submit for verification.
 
 A press stays eligible for `window` ticks after it arrived: a press at tick T can fire on ticks T+1 ... T+window.
 
@@ -66,7 +72,7 @@ A press stays eligible for `window` ticks after it arrived: a press at tick T ca
 * **Settings page** (Geode mod list > Predictive Input Buffer > settings): *Buffer Mode* is a selector whose
   labels include the buffer size, e.g. `3 - Medium (6 ticks)`. The choice is saved by Geode and persists between sessions.
 * **Pause menu**: a button at the bottom shows the live readout, e.g. `Input Buffer: 3 - Medium (6 ticks, ~25 ms)`; click it to cycle modes.
-* **Hotkey** (default **Shift+B**, rebindable, supports controller buttons): cycles Off > Low > Medium > High during a level and shows a brief toast (can be turned off).
+* **Hotkey** (default **Shift+B**, rebindable, supports controller buttons): cycles Off > Low > Medium > High > Extreme > Ultimate during a level and shows a brief toast (can be turned off).
 * **HUD indicator** (off by default): a small `BUFFERED` label while a press is waiting.
 * **Debug logging** (off by default): logs each buffered press and fire with its tick numbers, plus a ticks-per-second measurement every 1000 ticks.
 
@@ -82,6 +88,8 @@ Everything lives in **`src/BufferConfig.hpp`**:
 inline constexpr int kLowTicks    = 4;
 inline constexpr int kMediumTicks = 6;
 inline constexpr int kHighTicks   = 10;
+inline constexpr int kExtremeTicks  = 20;
+inline constexpr int kUltimateTicks = 45;
 ```
 
 After editing, update the matching labels in `mod.json` (`buffer-mode` > `one-of`, plus the description text), then run

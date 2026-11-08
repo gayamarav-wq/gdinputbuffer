@@ -8,7 +8,7 @@
 	},
 	"id": "yourname.input-buffer",
 	"name": "Predictive Input Buffer",
-	"version": "v1.0.0",
+	"version": "v1.1.0",
 	"developer": "YourName",
 	"description": "Practice and accessibility assist: holds a jump press for a few physics ticks and fires it on the first tick you can act. Turn it off (mode 1) for any run you plan to submit for verification.",
 	"repository": "https://github.com/yourname/input-buffer",
@@ -17,19 +17,21 @@
 		"buffer-mode": {
 			"type": "string",
 			"name": "Buffer Mode",
-			"description": "How long a press that arrives while you cannot act is held and then fired on the first tick you can.\n<cy>1 - Off</c>: vanilla input.\n<cy>2 - Low</c>: up to 4 ticks.\n<cy>3 - Medium</c>: up to 6 ticks.\n<cy>4 - High</c>: up to 10 ticks.\nA tick is one physics step of the game. At the usual 240 ticks per second, 4 / 6 / 10 ticks is about 17 / 25 / 42 ms. <cr>Recommended OFF for runs submitted for verification.</c>",
+			"description": "How long a press that arrives while you cannot act is held and then fired on the first tick you can.\n<cy>1 - Off</c>: vanilla input.\n<cy>2 - Low</c>: up to 4 ticks.\n<cy>3 - Medium</c>: up to 6 ticks.\n<cy>4 - High</c>: up to 10 ticks.\n<cy>5 - Extreme</c>: up to 20 ticks.\n<cy>6 - Ultimate</c>: up to 45 ticks.\nA tick is one physics step of the game. At the usual 240 ticks per second, 4 / 6 / 10 / 20 / 45 ticks is about 17 / 25 / 42 / 83 / 188 ms. Extreme and Ultimate are very forgiving and can fire a jump you no longer meant. <cr>Recommended OFF for runs submitted for verification.</c>",
 			"default": "1 - Off",
 			"one-of": [
 				"1 - Off",
 				"2 - Low (4 ticks)",
 				"3 - Medium (6 ticks)",
-				"4 - High (10 ticks)"
+				"4 - High (10 ticks)",
+				"5 - Extreme (20 ticks)",
+				"6 - Ultimate (45 ticks)"
 			]
 		},
 		"cycle-key": {
 			"type": "keybind",
 			"name": "Cycle Mode Hotkey",
-			"description": "Cycles Off > Low > Medium > High while a level is open. Can be rebound to a keyboard key, mouse button or controller button.",
+			"description": "Cycles Off > Low > Medium > High > Extreme > Ultimate while a level is open. Can be rebound to a keyboard key, mouse button or controller button.",
 			"default": "Shift+B",
 			"category": "gameplay"
 		},

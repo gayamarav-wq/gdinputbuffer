@@ -5,7 +5,7 @@ Use practice mode and a custom level or any level with the listed objects.
 
 ## 0. Load / package
 - [ ] Geode shows "Predictive Input Buffer" enabled, no error badge; no dependencies listed.
-- [ ] Settings page opens; Buffer Mode selector shows the four labelled entries; value persists after restarting the game.
+- [ ] Settings page opens; Buffer Mode selector shows the six labelled entries; value persists after restarting the game.
 
 ## 1. Tick assumption (do this first)
 - [ ] Play 10 s in a level. The log line `1000 counted ticks in N ms (M processCommands calls incl. half ticks), game dt = D s` should show
@@ -16,11 +16,13 @@ Use practice mode and a custom level or any level with the listed objects.
 - [ ] Mode Off: no `press` / `FIRE` lines appear in the log at all; play a level you know well, inputs feel identical.
 - [ ] Optionally run the same practice section with the mod disabled in Geode and compare.
 
-## 3. Window sizes (repeat for Low, Medium, High)
+## 3. Window sizes (repeat for Low, Medium, High, Extreme, Ultimate)
 Cube in mid-air, tap once, land with the player able to act **exactly N ticks** after the press.
 - [ ] Log: `FIRE ... age = N` fires for every N <= window (age is reported in ticks).
 - [ ] A landing 1 tick after the window: no `FIRE`, no jump.
 - [ ] One tap never produces two `FIRE` lines; holding through landing produces no extra jump from the mod.
+- [ ] Extreme (20) and Ultimate (45): tap, then land 20 / 45 ticks later: `FIRE ... age = 20` / `age = 45`; one tick later: no `FIRE`.
+      With these two, also confirm that a tap made far from any landing does not produce a surprise jump later than the window.
 
 ## 4. Gamemodes / objects
 - [ ] Cube: early tap before landing jumps on landing. Same for upside-down (gravity flip).
