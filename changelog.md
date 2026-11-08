@@ -11,7 +11,7 @@
 ## Known limitations
 
 * **Not yet verified in-game.** The buffering logic is unit-tested; the hooks were only type-checked against API stand-ins. Use `TESTING.md`.
-* Assumes `GJBaseGameLayer::processCommands` runs once per physics step. Enable *Debug Logging* and check that it reports about 240 ticks per second.
+* Assumes non-half-tick `GJBaseGameLayer::processCommands` calls happen once per physics step (half ticks are ignored). Enable *Debug Logging* and check that it reports about 240 ticks per second.
 * Ship, UFO, wave and swing copter always act on a press, so there is nothing to buffer. Orb presses made in those modes are not buffered.
 * Pads trigger automatically in GD (no press), so they need no buffering.
 * After an orb has been used, a second press while still overlapping it is treated as "can act" (same as vanilla), not buffered.

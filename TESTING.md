@@ -8,8 +8,9 @@ Use practice mode and a custom level or any level with the listed objects.
 - [ ] Settings page opens; Buffer Mode selector shows the four labelled entries; value persists after restarting the game.
 
 ## 1. Tick assumption (do this first)
-- [ ] Play 10 s in a level. Log shows `last 1000 ticks took ~4167 ms ... dt = 0.004167` (about 240 ticks/s). If it shows ~60 ticks/s or dt ~ 0.0167,
-      `processCommands` is per-frame, not per-tick: stop and see "Hook assumptions" below.
+- [ ] Play 10 s in a level. The log line `1000 counted ticks in N ms (M processCommands calls incl. half ticks), game dt = D s` should show
+      N ~ 4167 (about 240 counted ticks/s) and D ~ 0.004167. M may be larger than 1000 if the game also runs half ticks (they are not counted).
+      If N is ~16667 (60/s) or D ~ 0.0167, counted calls are per-frame, not per-tick: stop and see "Hook assumptions" below.
 
 ## 2. Mode 1 == vanilla
 - [ ] Mode Off: no `press` / `FIRE` lines appear in the log at all; play a level you know well, inputs feel identical.
@@ -40,6 +41,6 @@ Cube in mid-air, tap once, land with the player able to act **exactly N ticks** 
 ## Hook assumptions to confirm if something is off
 1. `GJBaseGameLayer::handleButton(bool down, int button, bool isPlayer1)` is where the game applies a queued press to the player objects
    (the mod detects this via `PlayerObject::buttonDown` changing).
-2. `GJBaseGameLayer::processCommands(float dt)` runs once per physics step.
+2. `GJBaseGameLayer::processCommands(float dt, bool isHalfTick, bool isLastTick)`: calls with `isHalfTick == false` happen once per physics step.
 3. `PlayerObject::incrementJumps()` is called when a player jumps / uses an orb.
 If 1 is wrong the mod degrades to vanilla (nothing is ever armed); if 2 is wrong the windows will be too long/short by the same factor.

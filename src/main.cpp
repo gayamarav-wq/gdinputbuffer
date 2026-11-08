@@ -12,7 +12,7 @@
 //
 //  Hook points (all of them, nothing else):
 //    GJBaseGameLayer::handleButton   observe real presses/releases
-//    GJBaseGameLayer::processCommands  once per physics tick: deliver / expire
+//    GJBaseGameLayer::processCommands  once per full physics tick (half ticks skipped): deliver / expire
 //    PlayerObject::incrementJumps    "this player just acted" safety net
 //    PlayerObject::playerDestroyed   reset on death
 //    PlayLayer::setupHasCompleted / resetLevel / pauseGame / onQuit / levelComplete
@@ -27,6 +27,7 @@
 #include <Geode/modify/PlayerObject.hpp>
 
 #include <chrono>
+#include <cstdint>
 #include <string>
 
 #include "BufferConfig.hpp"
@@ -44,6 +45,8 @@ struct Runtime {
     bool debug = false;
     bool acted[2] = {false, false};  // set by the incrementJumps hook
     std::chrono::steady_clock::time_point lastTickLog{};
+    std::uint64_t callsTotal = 0;     // every processCommands call (incl. half ticks), debug only
+    std::uint64_t callsAtLastLog = 0;
 };
 
 Runtime& rt() {
@@ -164,21 +167,30 @@ class $modify(IBBaseGameLayer, GJBaseGameLayer) {
         }
     }
 
-    // Runs once per physics tick, before the game processes that tick.
-    void processCommands(float dt) {
+    // processCommands is called by the game for every physics sub-step, including
+    // "half ticks" (2.2081 signature: dt, isHalfTick, isLastTick). Only full ticks
+    // count towards the buffer window; half ticks are forwarded untouched.
+    void processCommands(float dt, bool isHalfTick, bool isLastTick) {
         if (!isPlayLayer(this)) {
-            GJBaseGameLayer::processCommands(dt);
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
             return;
         }
         auto& r = rt();
+        ++r.callsTotal;
+        if (isHalfTick) {
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
+            return;
+        }
         r.lastTickDt = dt;
         const auto now = r.buf.beginTick();
 
-        if (r.debug && now % 1000 == 0) {  // lets you verify "one call == one tick" and the tick rate
+        if (r.debug && now % 1000 == 0) {  // lets you verify the tick rate and the half-tick ratio
             const auto t = std::chrono::steady_clock::now();
             const auto ms = std::chrono::duration<double, std::milli>(t - r.lastTickLog).count();
-            log::info("[tick {}] last 1000 ticks took {:.0f} ms wall time, game dt = {:.6f} s", now, ms, dt);
+            log::info("[tick {}] 1000 counted ticks in {:.0f} ms wall time ({} processCommands calls incl. half ticks), game dt = {:.6f} s",
+                      now, ms, r.callsTotal - r.callsAtLastLog, dt);
             r.lastTickLog = t;
+            r.callsAtLastLog = r.callsTotal;
         }
 
         if (r.buf.anyActive()) {
@@ -199,7 +211,7 @@ class $modify(IBBaseGameLayer, GJBaseGameLayer) {
                 }
             }
         }
-        GJBaseGameLayer::processCommands(dt);
+        GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
     }
 };
 
@@ -305,10 +317,10 @@ class $modify(IBPauseLayer, PauseLayer) {
 // ============================================================================
 $on_mod(Loaded) {
     refreshSettings();  // the change-listeners below do not fire for the initial value
-    listenForSettingChanges("buffer-mode", [](std::string value) {
+    listenForSettingChanges<std::string>("buffer-mode", [](std::string value) {
         applyMode(ibuf::parseMode(value));
     });
-    listenForSettingChanges("debug-log", [](bool value) {
+    listenForSettingChanges<bool>("debug-log", [](bool value) {
         rt().debug = value;
     });
 }

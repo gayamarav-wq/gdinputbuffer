@@ -54,7 +54,7 @@ Geode's mod list should show **Predictive Input Buffer** with no missing depende
 | 3 | Medium | up to **6** ticks | ~25 ms |
 | 4 | High | up to **10** ticks | ~42 ms |
 
-A **tick** is one physics step of the game (one call of `GJBaseGameLayer::processCommands`).
+A **tick** is one physics step of the game (one non-half-tick call of `GJBaseGameLayer::processCommands`).
 The window is counted in ticks, never in wall-clock time or rendered frames, so it is the same at any FPS.
 The tick rate is **not hardcoded**: the mod counts the ticks the game actually runs and uses the game's own step delta only
 to print the millisecond estimates. *If you meant 4/6/10 frames at 60 FPS rather than ticks, multiply the constants by 4 (see tuning).*
@@ -104,7 +104,7 @@ The default mode is `kDefaultMode` (and `"default"` in `mod.json`).
 ## Known limitations
 
 See `changelog.md` for the short list. Highlights: nothing has been run in-game yet; the two hook points
-(`handleButton(bool,int,bool)`, `processCommands(float)`) assume one `processCommands` call per physics step, which the debug log lets you confirm;
+(`handleButton(bool,int,bool)`, `processCommands(float,bool,bool)`) assume one non-half-tick `processCommands` call per physics step, which the debug log lets you confirm;
 orbs are not buffered while in ship/UFO/wave/swing; platformer left/right is not buffered; the level editor playtest is not covered.
 
 ## Layout

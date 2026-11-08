@@ -41,7 +41,11 @@ if missing:
 
 if not re.fullmatch(r"[a-z0-9_\-]+\.[a-z0-9_\-]+", mod["id"]): errors.append("bad mod id")
 if not re.fullmatch(r"v\d+\.\d+\.\d+", mod["version"]): errors.append("bad version")
-if mod.get("gd") != "2.2081": errors.append('"gd" is not 2.2081')
+gd = mod.get("gd")
+if not isinstance(gd, dict) or not gd.get("win"):
+    errors.append('"gd" must be an object with per-platform keys (Geode CMake reads gd.win)')
+elif any(v != "2.2081" for v in gd.values()):
+    errors.append('every "gd" entry must be 2.2081')
 low_desc = mod["description"].lower()
 for w in ("practice", "accessibility", "verification"):
     if w not in low_desc: errors.append(f'mod description is missing "{w}"')
